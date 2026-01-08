@@ -78,8 +78,11 @@ Network designs are compared using:
 
 ---
 
-## Reference
-This project is inspired by research from the **MIT Center for Transportation & Logistics (CTL)** on omnichannel network design and inventory positioning, adapted into a practical, resume-scale analytics project focused on retail decision-making.
+## References
+
+- Allen, G., & Ishida, S. (2019). *B2B Omnichannel Network Design and Inventory Positioning.*  
+  MIT Center for Transportation & Logistics, Massachusetts Institute of Technology.  
+  https://ctl.mit.edu/pub/thesis/b2b-omnichannel-network-design-and-inventory-positioning
 
 ---
 
