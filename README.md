@@ -80,7 +80,22 @@ Network designs are compared using:
 
 ## References
 
-- Allen, G., & Ishida, S. (2019). *B2B Omnichannel Network Design and Inventory Positioning.*  
+1. Arslan, A. M., Klibi, W., & Montreuil, B. (2021).  
+   **Distribution network deployment for omnichannel retailing**.  
+   *European Journal of Operational Research*, 294(3), 1023–1046.  
+   https://doi.org/10.1016/j.ejor.2021.02.048
+
+2. Nguyen, T. H., Klibi, W., & Ben Mohamed, A. (2025).  
+   **Designing profit-maximizing omnichannel distribution networks for high responsiveness**.  
+   *International Journal of Production Economics*, 268, 109118.  
+   https://doi.org/10.1016/j.ijpe.2024.109118
+
+3. Abouelrous, A., Gabor, A. F., & Zhang, Y. (2022).  
+   **Optimizing the inventory and fulfillment of an omnichannel retailer: A stochastic approach with scenario clustering**.  
+   *Computers & Industrial Engineering*, 170, 108316.  
+   https://doi.org/10.1016/j.cie.2022.108316
+   
+4. Allen, G., & Ishida, S. (2019). *B2B Omnichannel Network Design and Inventory Positioning.*  
   MIT Center for Transportation & Logistics, Massachusetts Institute of Technology.  
   https://ctl.mit.edu/pub/thesis/b2b-omnichannel-network-design-and-inventory-positioning
 
