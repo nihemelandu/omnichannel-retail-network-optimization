@@ -1,1 +1,8 @@
-
+🔹 The scenarios are usually about uncertainty, not just alternative designs. A scenario-based optimization framework is about building an optimization model that explicitly accounts for uncertainty
+🔹 The framework evaluates performance across scenarios, not just within one
+What typically varies across scenarios?
+Scenarios usually represent different futures, such as:
+📈 E-commerce demand growth rates (low / medium / high)
+🛒 Channel mix (store vs. online fulfillment)
+⏱ Service-level expectations (same-day vs. next-day)
+🌍 Geographic demand shifts
