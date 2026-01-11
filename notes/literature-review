@@ -1,0 +1,19 @@
+Paper 1 applied and extended an existing modeling framework to a new problem domain.
+# OR Taxonomy
+
+- **Optimization Models**
+  - Broad category of models seeking to maximize or minimize an objective subject to constraints.
+  
+  - **Mixed-Integer Linear Programming (MILP)**
+    - Linear objective and constraints
+    - Some variables are integer (often binary)
+    - Used for yes/no decisions, e.g., opening facilities, assigning customers
+    
+    - **Facility Location Models**
+      - Main decisions: where to locate facilities (deployment)
+      - Sometimes includes allocation of demand points to facilities
+    
+      - **Location–Allocation Models**
+        - Explicitly includes customer/facility assignment variables
+        - Examples: p-median, capacitated location–allocation, covering models
+        - Structure used in Stage 1 of Arslan, Klibi & Montreuil (2021)
