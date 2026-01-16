@@ -1,0 +1,1 @@
+The objective function of a two-stage stochastic MILP is difficult to minimize because it includes an expected optimal recourse cost. While the recourse problem for a fixed first-stage decision and a fixed realization of uncertainty is tractable, the difficulty arises from taking the expectation over the optimal recourse cost across all possible realizations of uncertainty.
