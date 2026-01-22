@@ -111,4 +111,4 @@ Network designs are compared using:
 ---
 
 ## Disclaimer
-This project uses synthetic and anonymized data for educational and portfolio purposes and does not represent any specific retailer’s proprietary network.
+This project uses synthetic and anonymized data for proof of concept purposes and does not represent any specific retailer’s proprietary network.
