@@ -4,7 +4,7 @@
 
 As e-commerce demand grows, our existing distribution network — built for bulk store replenishment — is increasingly unable to fulfill online orders profitably and on time. The central warehouse is too far from urban customers to meet next-day delivery expectations, stores were never designed for order picking, and transportation capacity is already under pressure.
 
-**The question this project answers:** Given our existing network, what is the optimal way to reconfigure it — repurposing stores as fulfillment points, opening urban fulfillment centers, or both — to serve online and in-store customers profitably as e-commerce scales?
+**The question this project answers:** Given our existing network, what is the profit-maximizing way to restructure our existing distribution network to serve both physical and online customers simultaneously as e-commerce scales?
 
 ---
 
