@@ -5,12 +5,17 @@ __pycache__/
 .env
 venv/
 env/
+env_network/
 
 # Outputs
 outputs/results/*
 outputs/logs/*
 !outputs/results/.gitkeep
 !outputs/logs/.gitkeep
+
+data/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
 
 # Jupyter
 .ipynb_checkpoints/
