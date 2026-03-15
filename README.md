@@ -35,7 +35,7 @@ The distance between the central warehouse and the city is not just a logistics 
 
 Deployment decisions — which stores to activate, whether to open an urban fulfillment center — must be made before online demand fully materializes. Optimizing for a single demand forecast is insufficient; the right network structure must perform well across a range of plausible futures.
 
-This project models the problem as a **two-stage stochastic program**: network configuration decisions are made in Stage 1 before uncertainty is resolved, and operational decisions (order assignment, replenishment quantities, inventory levels) are made in Stage 2 after demand is observed. The model is solved across 18 demand scenarios combining city size, customer delivery expectations, and online-to-physical demand ratios.
+This project models the problem as a **two-stage stochastic program**: network configuration decisions are made in Stage 1 before uncertainty is resolved, and operational decisions (order assignment, replenishment quantities, inventory levels) are made in Stage 2 after demand is observed. The model is solved across 9 demand scenarios combining city size, customer delivery expectations, and online-to-physical demand ratios.
 
 Three network strategies are evaluated:
 
@@ -75,21 +75,16 @@ Sensitivity analysis stress-tests four variables: store fulfillment capacity, th
 ## Repository Structure
 
 ```
+├── src/
+│   ├── config.py
+│   ├── scenario_generator.py
+│   ├── subproblem.py
+│   └── master_problem.py
+├── tests/
+├── notebooks/
 ├── data/
-│   ├── raw/                     # Instance generation inputs
-│   └── scenarios/               # Monte Carlo generated scenario sets
-├── model/
-│   ├── stage1.py                # Stage 1: network deployment decisions
-│   ├── stage2.py                # Stage 2: order fulfillment subproblem
-│   └── l_shaped.py              # Integer L-shaped solution algorithm
-├── analysis/
-│   ├── scenario_analysis.py     # Network performance across demand futures
-│   └── sensitivity.py           # Parameter sensitivity experiments
-├── results/
-│   ├── network_structures/      # Optimal configurations by scenario
-│   └── figures/                 # Inventory, capacity, and cost visualizations
-└── notebooks/
-    └── results_walkthrough.ipynb
+├── outputs/
+├── docs/
 ```
 
 ---
