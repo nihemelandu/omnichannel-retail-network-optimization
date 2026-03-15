@@ -210,76 +210,40 @@ def compute_sw_physical_cost_adjustment(
 
         for s in range(cfg.NUM_STORES):
             rep_periods = inst.store_replenishment_periods[s]
-
-            # Cycle structure and cost treatment:
-            #
-            # rep_periods = [5, 10, 15, 20, 25] for a regular store (T=30)
-            #
-            # FIRST cycle [0, rep_periods[0]):
-            #   Demand covered by INITIAL INVENTORY — no replenishment fires.
-            #   Skip both replenishment and holding cost.
-            #   (initial inventory cost is a pre-horizon sunk cost)
-            #
-            # INTERIOR cycles [rep_periods[k-1], rep_periods[k]):
-            #   A replenishment fires at rep_periods[k] to cover this demand.
-            #   Charge BOTH replenishment cost AND holding cost.
-            #
-            # LAST partial cycle [rep_periods[-1], T):
-            #   The day-rep_periods[-1] delivery already arrived and is on shelves.
-            #   Demand on these days depletes that inventory — holding cost applies.
-            #   No new replenishment fires within the horizon — replenishment cost = $0.
-            #   Charge HOLDING COST ONLY.
-
-            if len(rep_periods) == 0:
-                continue
+            # Build list of replenishment period boundaries
+            # Period i covers days [rep_periods[i-1], rep_periods[i])
+            boundaries = list(rep_periods) + [cfg.NUM_PERIODS]
 
             for p in range(cfg.NUM_PRODUCTS):
                 price = inst.product_prices[p]
 
-                # --- Interior cycles: both replenishment and holding ---
-                # Cycle k covers demand from [rep_periods[k-1], rep_periods[k])
-                # replenished at rep_periods[k]. Skip k=0 (first cycle = initial inv).
-                for k in range(1, len(rep_periods)):
-                    t_start = rep_periods[k - 1]
-                    t_end   = rep_periods[k]
+                for i in range(1, len(boundaries)):
+                    t_start = boundaries[i - 1]
+                    t_end   = boundaries[i]
 
+                    # Physical demand accumulated in this replenishment cycle
                     cycle_demand = sum(
                         scenario.physical_demand.get((p, s, t), 0)
                         for t in range(t_start, t_end)
                     )
 
-                    # Replenishment cost: delivery on rep_periods[k] covers this demand
-                    scenario_cost += cfg.STORE_REPLENISHMENT_COST * price * cycle_demand
+                    # Replenishment cost: pay replenishment rate on cycle demand
+                    replenishment_cost = (
+                        cfg.STORE_REPLENISHMENT_COST * price * cycle_demand
+                    )
+                    scenario_cost += replenishment_cost
 
-                    # Holding cost: sawtooth — inventory starts at cycle_demand,
-                    # depletes linearly to 0 by the next replenishment
+                    # Holding cost: average inventory over cycle = cycle_demand / 2
+                    # (sawtooth approximation: inventory starts at cycle_demand,
+                    #  depletes linearly to 0 by end of cycle)
                     cycle_length = t_end - t_start
                     if cycle_length > 0:
                         avg_inventory = cycle_demand / 2.0
-                        scenario_cost += (
+                        holding_cost  = (
                             cfg.STORE_HOLDING_COST * price
                             * avg_inventory * cycle_length
                         )
-
-                # --- Last partial cycle: holding cost only ---
-                # Days from final replenishment to end of horizon.
-                # Inventory received on rep_periods[-1] sits on shelves — holding applies.
-                # No replenishment fires after rep_periods[-1] within the horizon.
-                t_last_start = rep_periods[-1]
-                t_last_end   = cfg.NUM_PERIODS        # e.g. day 30
-
-                if t_last_end > t_last_start:
-                    last_cycle_demand = sum(
-                        scenario.physical_demand.get((p, s, t), 0)
-                        for t in range(t_last_start, t_last_end)
-                    )
-                    last_cycle_length = t_last_end - t_last_start
-                    avg_inventory_last = last_cycle_demand / 2.0
-                    scenario_cost += (
-                        cfg.STORE_HOLDING_COST * price
-                        * avg_inventory_last * last_cycle_length
-                    )
-                    # No replenishment cost — delivery for this demand is outside horizon
+                        scenario_cost += holding_cost
 
         total_cost_across_scenarios += scenario_cost
 
@@ -631,7 +595,7 @@ class SubproblemSolver:
                                 f"InvBal_fc_reg_{sp_label}_{p}_{t}"
                             )
 
-        # --- Transportation capacity constraint (Equation 9) ---
+ # --- Transportation capacity constraint (Equation 9) ---
         # k_t = 1.2 * avg_daily_demand * avg_rep_frequency
         # avg_daily_demand: total expected demand across all stores and products per day
         # avg_rep_frequency: average days between replenishments across all stores
@@ -777,7 +741,7 @@ class SubproblemSolver:
         else:
             status = pulp.LpStatus[model.status]
             # --- IIS Diagnostic: identify conflicting constraints ---
-            if verbose:  # only print IIS diagnostic when verbose=True
+            if verbose or True:  # always print IIS when infeasible
                 print("\n=== INFEASIBILITY DIAGNOSTIC ===")
                 print("Checking for violated constraints...")
                 violated = []
@@ -944,6 +908,57 @@ class SubproblemSolver:
                         physical_revenue += price * d_pst
 
         profit = (pulp.value(model.objective) or 0.0) - sw_physical_cost_adjustment
+
+        # --- Objective Reconciliation Check ---
+        # Verifies that the MIP objective value equals the sum of individually
+        # extracted cost and revenue components. A discrepancy signals either:
+        #   (a) an extraction bug — a term missing, double-counted, or wrong rate
+        #   (b) threshold filtering dropping non-trivial variable values (1e-6 cutoff)
+        #   (c) physical revenue computation error — most complex extraction path
+        #
+        # The SW adjustment is excluded from both sides — it is applied identically
+        # to both the reported profit and the MIP objective, so it cancels out.
+        # We compare the raw MIP objective against the raw reconstructed profit.
+        #
+        # Tolerance of $1.00 is generous given problem scale (~$2M profit).
+        # Discrepancy beyond this threshold signals a genuine extraction bug.
+
+        mip_objective = pulp.value(model.objective) or 0.0
+
+        reconstructed_profit = (
+              physical_revenue
+            + online_revenue
+            - replenishment_cost
+            - holding_cost
+            - picking_cost
+            - transport_cost
+            - warehouse_cost
+            - backlog_cost
+        )
+
+        discrepancy = abs(reconstructed_profit - mip_objective)
+        tolerance   = 1.0   # $1.00 tolerance
+
+        if discrepancy > tolerance:
+            print(f"\n{'='*60}")
+            print(f"OBJECTIVE RECONCILIATION FAILED")
+            print(f"  MIP objective        : ${mip_objective:>15,.2f}")
+            print(f"  Reconstructed profit : ${reconstructed_profit:>15,.2f}")
+            print(f"  Discrepancy          : ${discrepancy:>15,.2f}")
+            print(f"  Tolerance            : ${tolerance:>15,.2f}")
+            print(f"--- Component Breakdown ---")
+            print(f"  Physical Revenue     : ${physical_revenue:>15,.2f}")
+            print(f"  Online Revenue       : ${online_revenue:>15,.2f}")
+            print(f"  Replenishment Cost   : ${replenishment_cost:>15,.2f}")
+            print(f"  Holding Cost         : ${holding_cost:>15,.2f}")
+            print(f"  Picking Cost         : ${picking_cost:>15,.2f}")
+            print(f"  Transport Cost       : ${transport_cost:>15,.2f}")
+            print(f"  Warehouse Cost       : ${warehouse_cost:>15,.2f}")
+            print(f"  Backlog Cost         : ${backlog_cost:>15,.2f}")
+            print(f"{'='*60}\n")
+        else:
+            print(f"PASS: Objective reconciliation — "
+                  f"discrepancy ${discrepancy:.4f} within ${tolerance:.2f} tolerance")
 
         return SubproblemSolution(
             profit=profit,
