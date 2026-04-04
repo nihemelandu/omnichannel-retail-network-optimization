@@ -65,7 +65,16 @@ The business needs answers to three strategic questions:
 
 ---
 
-## 3. Fulfillment Strategies Evaluated
+## 3. Technical Goal
+
+Identify the profit-maximizing network configuration by evaluating all
+64 City1 configurations across N=50 Monte Carlo scenarios using a
+two-stage stochastic MIP, and validate that the results are stable,
+internally consistent, and robust to scenario sample size.
+
+---
+
+## 4. Fulfillment Strategies Evaluated
 
 Three fulfillment strategies are evaluated, corresponding to increasing
 levels of network transformation:
@@ -83,7 +92,7 @@ optimizes the allocation dynamically across scenarios.
 
 ---
 
-## 4. Stakeholders
+## 5. Stakeholders
 
 | Stakeholder | Primary Concern |
 |---|---|
@@ -93,7 +102,7 @@ optimizes the allocation dynamically across scenarios.
 
 ---
 
-## 5. Business KPIs
+## 6. Business KPIs
 
 These are the metrics that matter to the business, independent of how
 the model works technically.
@@ -108,7 +117,7 @@ the model works technically.
 
 ---
 
-## 6. Technical Metrics
+## 7. Technical Metrics
 
 These metrics evaluate the quality and reliability of the optimization
 model, giving us confidence that the business KPIs reported are
@@ -125,7 +134,7 @@ trustworthy.
 
 ---
 
-## 7. Solution Approach
+## 8. Solution Approach
 
 The project evaluates three fulfillment strategies using a two-stage
 stochastic Mixed-Integer Program (MIP).
@@ -147,7 +156,7 @@ City1.
 
 ---
 
-## 8. Success Criteria
+## 9. Success Criteria
 
 **Model Validity**
 - Objective reconciliation passes with $0.00 discrepancy on all three
@@ -171,7 +180,7 @@ City1.
 
 ---
 
-## 9. Constraints and Assumptions
+## 10. Constraints and Assumptions
 
 - **City1 scope:** 5 stores, 1 FC, 64 configurations. City2 is out of
   scope for the current iteration.
